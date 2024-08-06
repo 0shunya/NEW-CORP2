@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Corporate Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+        .header {
+            color: red;
+        }
+    </style>
+</head>
+<body style="background-image: url('Corp.jpg'); background-size: cover; min-height: 100vh; width: 100; background-position: center; position: relative;">
+    <header class="header text-center py-4">
+        <h1 class="text-4xl">Corporate Management System</h1>
+    </header>
+    
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-md" style = "margin-bottom: 10%; margin-left: 15%;">
+            <h2 class="text-3xl font-bold mb-6" style = "padding-left: 15%;">Login</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium" for="username">Username</label>
+                    <input class="mt-1 block w-60 p-2 border border-gray-300 rounded-md" style="color: black;" type="text" id="username" required placeholder="John Doe">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium" for="password">Password</label>
+                    <input class="mt-1 block w-60 p-2 border border-gray-300 rounded-md" style="color: black;" type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-60 bg-red-600 text-white p-2 rounded-lg hover:bg-red-700">Login</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    const response = await fetch('/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, password })
+});
+    
+    const result = await response.json();
+    if (response.status === 200) {
+        alert('Login successful');
+        sessionStorage.setItem('username', username); // Store username in session storage
+        window.location.href = '/dashboard'; // Redirect to dashboard
+    } else {
+        alert(result.msg);
+    }
+});
+    </script>
+</body>
+</html>

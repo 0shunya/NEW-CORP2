@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Task - Corporate Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+        .header {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <header class="header text-center py-4">
+        <h1 class="text-4xl">Corporate Management System</h1>
+    </header>
+    
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-md">
+            <h2 class="text-3xl font-bold mb-6">Complete Task</h2>
+            <form id="task-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium" for="task">Task Description</label>
+                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" type="text" id="task" required placeholder="Task Description">
+                </div>
+                <button type="submit" class="w-full bg-red-600 text-white p-2 rounded-lg hover:bg-red-700">Complete Task</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('task-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const task_description = document.getElementById('task').value;
+            
+            const response = await fetch('/complete-task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({ task_description })
+            });
+            
+            const result = await response.json();
+            alert(result.msg);
+            if (response.status === 200) {
+                document.getElementById('task').value = '';
+            }
+        });
+    </script>
+</body>
+</html>

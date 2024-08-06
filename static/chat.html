@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Corporate Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+        .header {
+            color: red;
+        }
+        #chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="header text-center py-4">
+        <h1 class="text-4xl">Corporate Management System</h1>
+    </header>
+    
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-md">
+            <h2 class="text-3xl font-bold mb-6">Chat</h2>
+            <div id="chat-container" class="mb-4 p-4 border border-gray-300 rounded-md bg-white text-black">
+                <!-- Chat messages will be appended here -->
+            </div>
+            <form id="chat-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium" for="message">Message</label>
+                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" type="text" id="message" required placeholder="Your message">
+                </div>
+                <button type="submit" class="w-full bg-red-600 text-white p-2 rounded-lg hover:bg-red-700">Send</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        async function fetchMessages() {
+            try {
+                const response = await fetch('/chat', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch messages');
+                }
+                const messages = await response.json();
+                const chatContainer = document.getElementById('chat-container');
+                chatContainer.innerHTML = '';
+
+                // Append messages in reverse order (oldest first)
+                messages.reverse().forEach(msg => {
+                    const messageElement = document.createElement('div');
+                    messageElement.textContent = `${msg.username}: ${msg.message}`;
+                    chatContainer.appendChild(messageElement);
+                });
+
+                // Auto-scroll to the bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        }
+        
+        document.getElementById('chat-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = document.getElementById('message').value;
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message })
+                });
+                
+                const result = await response.json();
+                alert(result.msg);
+                if (response.status === 201) {
+                    document.getElementById('message').value = '';
+                    fetchMessages();  // Fetch the updated list of messages
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        });
+
+        // Initial fetch of messages
+        fetchMessages();
+    </script>
+</body>
+</html>

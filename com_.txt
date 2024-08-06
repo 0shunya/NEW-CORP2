@@ -1,0 +1,54 @@
+'''@app.route('/users', methods=['GET', 'POST'])
+@jwt_required()
+def users():
+    current_user_id = get_jwt_identity()
+    current_user = users_collection.find_one({"_id": ObjectId(current_user_id)})
+
+    if not current_user:
+        return jsonify({'message': 'user not found'}), 400
+    if current_user.get('role') != 'admin':
+        return jsonify({'message': 'user not authorized'}), 403
+    
+    data = load_data()
+    return jsonify(data)
+
+@app.route('/users/<user_id>', methods=['PUT'])
+@jwt_required()
+def user_details(user_id):
+    current_user_id = get_jwt_identity()
+    current_user = users_collection.find_one({"_id": ObjectId(current_user_id)})
+    user = users_collection.find_one({'_id': ObjectId(user_id)})
+
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    if str(current_user_id) != user_id and current_user.get('role') != 'admin':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    updated_user = request.json
+    update_user_data(user_id, updated_user)
+    return jsonify({'message': 'User updated successfully'}), 200'''
+
+    '''from flask import Flask
+
+app = Flask(__name__)'''
+
+"""@app.route('/')
+def Hello_World():
+    return 'Hello World'
+
+if __name__=='__main__':
+    app.run(debug=True)"""
+
+'''from flask import Flask,jsonify
+
+app = Flask(__name__)
+@app.route('/users')
+def get_users():
+    users = [
+        {'id':1, 'name':'Sanjay Dutt'},
+        {'id':2, 'name':'Akshay Kumar'}
+    ]
+    return jsonify(users)
+if __name__ == '__main__':
+    app.run(debug=True)'''

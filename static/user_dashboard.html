@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Corporate Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-10">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">User Dashboard</h1>
+            <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded">Logout</button>
+        </div>
+
+        <!-- Chat Room Card -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+            <h2 class="text-2xl font-bold mb-4">Chat Room</h2>
+            <div id="chat-room" class="h-64 overflow-y-scroll bg-gray-100 p-4 mb-4 border rounded"></div>
+            <form id="chat-form">
+                <input type="text" id="chat-message" placeholder="Type a message..." class="border p-2 rounded w-full mb-2">
+                <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded">Send</button>
+            </form>
+        </div>
+
+        <!-- Task Completion Card -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Complete a Task</h2>
+            <form id="task-form">
+                <input type="text" id="task-description" placeholder="Task Description" class="border p-2 rounded w-full mb-2">
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Task Completed</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('chat-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = document.getElementById('chat-message').value;
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const result = await response.json();
+            if (response.status === 201) {
+                document.getElementById('chat-message').value = '';
+                fetchChatMessages();
+            }
+        });
+
+        document.getElementById('task-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const taskDescription = document.getElementById('task-description').value;
+
+            const response = await fetch('/complete-task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({ task_description: taskDescription })
+            });
+
+            const result = await response.json();
+            alert(result.msg);
+            if (response.status === 200) {
+                document.getElementById('task-description').value = '';
+            }
+        });
+
+        async function fetchChatMessages() {
+            const response = await fetch('/chat', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+
+            const chats = await response.json();
+            const chatRoom = document.getElementById('chat-room');
+            chatRoom.innerHTML = '';
+
+            chats.forEach(chat => {
+                const message = document.createElement('div');
+                message.innerHTML = `
+                    <strong>${chat.username}:</strong> ${chat.message} <br>
+                    <small>${chat.timestamp}</small>
+                `;
+                chatRoom.appendChild(message);
+            });
+        }
+
+        // Fetch initial chat messages
+        fetchChatMessages();
+
+        // Logout button functionality
+        document.getElementById('logout-button').addEventListener('click', async function() {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+
+            const result = await response.json();
+            if (response.status === 200) {
+                localStorage.removeItem('access_token');
+                window.location.href = '/login';
+            } else {
+                alert(result.msg);
+            }
+        });
+    </script>
+</body>
+</html>

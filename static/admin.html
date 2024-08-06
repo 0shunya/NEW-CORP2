@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <button onclick="showCreateUserForm()">Create New User</button>
+    
+    <div id="createUserForm" style="display: none;">
+        <h2>Create New User</h2>
+        <form id="newUserForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password"><br><br>
+            <button type="button" onclick="createUser()">Create User</button>
+        </form>
+    </div>
+    
+    <script>
+        function showCreateUserForm() {
+            document.getElementById('createUserForm').style.display = 'block';
+        }
+
+        function createUser() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/create-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.msg);
+                if (data.msg === "User created successfully") {
+                    document.getElementById('newUserForm').reset();
+                    document.getElementById('createUserForm').style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
